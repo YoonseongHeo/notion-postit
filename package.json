@@ -1,0 +1,26 @@
+{
+  "name": "notion-postit",
+  "version": "0.1.0",
+  "description": "Notion Todo DB 연동 데스크톱 포스트잇 위젯",
+  "type": "module",
+  "main": "src/main/main.js",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build",
+    "package": "vite build && electron-builder --win",
+    "package:portable": "vite build && electron-builder --win portable"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "concurrently": "^9.0.0",
+    "electron": "^41.0.3",
+    "electron-builder": "^26.8.1",
+    "vite": "^6.0.0",
+    "wait-on": "^8.0.0"
+  }
+}

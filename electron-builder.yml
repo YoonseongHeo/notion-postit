@@ -1,0 +1,21 @@
+appId: com.youhost.notion-postit
+productName: Notion PostIt
+directories:
+  output: out
+  buildResources: resources
+files:
+  - "dist/**/*"
+  - "src/main/**/*"
+  - "package.json"
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: resources/icon.ico
+nsis:
+  oneClick: true
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  runAfterFinish: true
