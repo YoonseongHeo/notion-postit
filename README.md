@@ -3,6 +3,11 @@
 An always-on-top desktop PostIt widget that syncs with your Notion Todo database.
 Cycle task status with a single click — right from your desktop.
 
+<p align="center">
+  <img src="docs/screenshot-main.png" alt="Main view" width="280" />
+  <img src="docs/screenshot-settings.png" alt="Settings" width="280" />
+</p>
+
 ## Features
 
 - **Notion sync** — Real-time integration with Notion Calendar DB (Multi-select tags)
