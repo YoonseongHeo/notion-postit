@@ -1,57 +1,75 @@
 # Notion PostIt
 
-Notion Todo DB 연동 데스크톱 포스트잇 위젯.  
-항상 화면 위에 떠 있으며, 할 일 상태를 원클릭으로 변경합니다.
+An always-on-top desktop PostIt widget that syncs with your Notion Todo database.
+Cycle task status with a single click — right from your desktop.
 
-## 기능
+## Features
 
-- Notion Calendar DB (Multi-select 태그) 실시간 연동
-- 오늘 / 이번 주 / 전체 뷰 전환
-- 체크박스로 Todo → Doing → Done 순환 (Optimistic Update)
-- 제목 클릭 시 노션 페이지 열기
-- Always on Top + 시스템 트레이 + 글로벌 단축키 (Ctrl+Shift+N)
-- Done 항목 숨기기 토글
-- 5분 자동 새로고침
+- **Notion sync** — Real-time integration with Notion Calendar DB (Multi-select tags)
+- **View filters** — Today / Week / All
+- **One-click status** — Cycle through Todo → Doing → Done (Optimistic Update)
+- **Open in Notion** — Click a task title to jump to the Notion page
+- **Always on Top** — Toggle pin to keep the widget above other windows
+- **Opacity control** — Adjust window transparency via slider
+- **Dark / Light mode** — Toggle theme from the title bar
+- **System tray** — Minimize to tray, restore with click or global shortcut (`Ctrl+Shift+N`)
+- **Auto refresh** — Configurable interval (default: 5 min)
+- **i18n** — Korean / English UI
+- **Persistent settings** — All preferences saved across restarts
 
-## 셋업
+## Getting Started
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/YoonseongHeo/notion-postit.git
 cd notion-postit
-cp .env.example .env    # 토큰, DB ID 입력
+cp .env.example .env    # Enter your token and DB ID
 npm install
-npm run dev             # 개발 모드 (Vite + Electron)
+npm run dev             # Dev mode (Vite + Electron)
 ```
 
-## 빌드
+## Build
 
 ```bash
-npm run package           # Windows 인스톨러
+npm run package           # Windows NSIS installer
 npm run package:portable  # Portable exe
 ```
 
-## Notion 연동 설정
+## Notion Setup
 
-1. [notion.so/my-integrations](https://www.notion.so/my-integrations) 에서 Integration 생성
-2. Capabilities: Read content + Update content
-3. Todo DB → ··· → Connections 에서 Integration 연결
-4. `.env`에 토큰 입력 또는 앱 내 설정(⚙) 화면에서 입력
+1. Go to [notion.so/my-integrations](https://www.notion.so/my-integrations) and create an Integration
+2. Capabilities: **Read content** + **Update content**
+3. Open your Todo DB → `···` → **Connections** → Add your integration
+4. Enter the token in `.env` or in the app's Settings panel (⚙)
 
-## 프로젝트 구조
+### Expected DB Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Name` | Title | Task title |
+| `Tag` | Multi-select | Status tags (`Todo`, `Doing`, `Done 🙌`) + category tags |
+| `Date` | Date | Start / end date |
+| `긴급` | Checkbox | Urgent flag |
+
+## Project Structure
 
 ```
 src/
-├── main/                # Electron Main Process
-│   ├── main.js          # 앱 진입점, IPC 핸들러
-│   ├── notion-client.js # Notion API 래퍼
-│   ├── preload.js       # contextBridge
-│   ├── store.js         # electron-store 설정/캐시
-│   └── tray.js          # 시스템 트레이
-├── renderer/            # React UI
-│   ├── App.jsx          # 메인 앱
-│   ├── components/      # TitleBar, TabBar, TaskRow, Toast, Settings
-│   ├── hooks/           # useNotion (API 통신)
-│   └── lib/             # date-utils
+├── main/                  # Electron Main Process
+│   ├── main.js            # Entry point, IPC handlers
+│   ├── notion-client.js   # Notion API wrapper (query, update, retry)
+│   ├── preload.js         # contextBridge (window.api)
+│   ├── store.js           # electron-store (settings, cache, bounds)
+│   └── tray.js            # System tray menu
+├── renderer/              # React UI (Vite)
+│   ├── App.jsx            # Main app component
+│   ├── components/        # TitleBar, TaskRow, Toast, Settings
+│   ├── hooks/useNotion.js # Data fetch/update hook (optimistic update)
+│   └── lib/date-utils.js  # Date helpers
 └── shared/
-    └── constants.js     # IPC 채널명, 상태 태그, 기본 설정
+    ├── constants.js       # IPC channels, status tags, defaults
+    └── i18n.js            # ko/en translations
 ```
+
+## License
+
+[MIT](LICENSE)
