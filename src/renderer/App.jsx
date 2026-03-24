@@ -5,6 +5,7 @@ import Toast from './components/Toast';
 import Settings from './components/Settings';
 import { useNotion } from './hooks/useNotion';
 import { todayStr, fmtShort, getWeekRange, matchesDateView } from './lib/date-utils';
+import { t } from '../shared/i18n.js';
 
 const STATUS_ORDER = { 'Doing': 0, 'Todo': 1, 'Done 🙌': 2 };
 
@@ -34,6 +35,7 @@ export default function App() {
   const [alwaysOnTop, setAlwaysOnTop] = useState(true);
   const [opacity, setOpacity] = useState(1);
   const [darkMode, setDarkMode] = useState(false);
+  const [lang, setLang] = useState('ko');
 
   const isElectron = !!window.api;
 
@@ -49,6 +51,7 @@ export default function App() {
         setNotionLink(s.notionLink ?? true);
         const savedView = s.view ?? 'today';
         setView(savedView);
+        setLang(s.lang ?? 'ko');
         const dm = s.darkMode ?? false;
         setDarkMode(dm);
         document.documentElement.setAttribute('data-theme', dm ? 'dark' : 'light');
@@ -111,7 +114,7 @@ export default function App() {
     if (result.success) {
       setToast(`→ ${newStatus}`);
     } else {
-      setToast(`실패: ${result.error}`);
+      setToast(`${t(lang, 'failPrefix')}${result.error}`);
     }
   }, [updateStatus]);
 
@@ -119,6 +122,7 @@ export default function App() {
   const handleSaveSettings = useCallback(async (partial) => {
     if (partial.hideDone !== undefined) setHideDone(partial.hideDone);
     if (partial.notionLink !== undefined) setNotionLink(partial.notionLink);
+    if (partial.lang !== undefined) setLang(partial.lang);
     if (isElectron) {
       const updated = await window.api.setSettings(partial);
       setSettings(updated);
@@ -155,13 +159,19 @@ export default function App() {
 
   // 날짜 라벨
   const viewLabel = useMemo(() => {
-    if (view === 'today') return fmtShort(todayStr());
+    const weekdays = t(lang, 'weekdays');
+    const fmt = (dateStr) => {
+      if (!dateStr) return '';
+      const d = new Date(dateStr + 'T00:00:00');
+      return `${d.getMonth() + 1}/${d.getDate()}(${weekdays[d.getDay()]})`;
+    };
+    if (view === 'today') return fmt(todayStr());
     if (view === 'week') {
       const [ws, we] = getWeekRange();
-      return `${fmtShort(ws)} ~ ${fmtShort(we)}`;
+      return `${fmt(ws)} ~ ${fmt(we)}`;
     }
-    return '전체';
-  }, [view]);
+    return '';
+  }, [view, lang]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
@@ -170,6 +180,7 @@ export default function App() {
         alwaysOnTop={alwaysOnTop} onToggleAlwaysOnTop={handleToggleAlwaysOnTop}
         opacity={opacity} onOpacityChange={handleOpacityChange}
         darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode}
+        lang={lang}
       />
 
       {/* 서브 헤더 (기간 선택 + 카운트 + 설정) */}
@@ -181,9 +192,9 @@ export default function App() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {[
-            { key: 'today', label: '오늘' },
-            { key: 'week', label: '주간' },
-            { key: 'all', label: '전체' },
+            { key: 'today', label: t(lang, 'today') },
+            { key: 'week', label: t(lang, 'week') },
+            { key: 'all', label: t(lang, 'all') },
           ].map(({ key, label }) => (
             <button key={key} onClick={() => handleSetView(key)} style={{
               fontSize: 11, padding: '2px 6px', borderRadius: 4,
@@ -206,7 +217,7 @@ export default function App() {
           </span>
           <button
             onClick={() => setShowSettings(true)}
-            title="설정"
+            title={t(lang, 'settings')}
             style={{
               background: 'transparent', border: 'none',
               cursor: 'pointer', fontSize: 12, color: 'var(--text-fainter)',
@@ -219,7 +230,7 @@ export default function App() {
       {/* 로딩 표시 */}
       {loading && (
         <div style={{ padding: '0 8px', fontSize: 10, color: 'var(--text-faint)' }}>
-          동기화 중...
+          {t(lang, 'syncing')}
         </div>
       )}
 
@@ -239,7 +250,7 @@ export default function App() {
             textAlign: 'center', padding: '2rem 0',
             color: 'var(--text-fainter)', fontSize: 12,
           }}>
-            {view === 'today' ? '오늘 할 일 없음 🎉' : '항목 없음'}
+            {view === 'today' ? t(lang, 'emptyToday') : t(lang, 'emptyOther')}
           </div>
         )}
       </div>
@@ -257,7 +268,8 @@ export default function App() {
       {/* 설정 패널 */}
       {showSettings && (
         <Settings
-          settings={settings || { notionToken: '', databaseId: '394c0df8-9800-4e42-88d8-346ef29e5e80', refreshInterval: 300000 }}
+          settings={settings || { notionToken: '', databaseId: '394c0df8-9800-4e42-88d8-346ef29e5e80', refreshInterval: 300000, lang: 'ko' }}
+          lang={lang}
           onSave={handleSaveSettings}
           onClose={() => setShowSettings(false)}
         />

@@ -29,7 +29,7 @@ export function useNotion() {
         // 브라우저 직접 호출 (개발용 - .env의 토큰 필요)
         // 여기서는 빈 배열 반환 (프로토타입용 mock 데이터는 App에서 처리)
         setItems([]);
-        setError('Electron 환경이 아닙니다. Mock 데이터를 사용합니다.');
+        setError('Not in Electron. Using mock data.');
       }
       setLastSync(new Date());
     } catch (err) {

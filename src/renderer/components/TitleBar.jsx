@@ -1,6 +1,7 @@
 import React from 'react';
+import { t } from '../../shared/i18n.js';
 
-export default function TitleBar({ alwaysOnTop, onToggleAlwaysOnTop, opacity, onOpacityChange, darkMode, onToggleDarkMode }) {
+export default function TitleBar({ alwaysOnTop, onToggleAlwaysOnTop, opacity, onOpacityChange, darkMode, onToggleDarkMode, lang }) {
   const api = window.api;
 
   return (
@@ -19,13 +20,13 @@ export default function TitleBar({ alwaysOnTop, onToggleAlwaysOnTop, opacity, on
           min="0.2" max="1" step="0.05"
           value={opacity}
           onChange={e => onOpacityChange(parseFloat(e.target.value))}
-          title={`투명도 ${Math.round(opacity * 100)}%`}
+          title={t(lang, 'opacity')(opacity)}
           style={{ width: 48, height: 12, cursor: 'pointer', accentColor: 'var(--text-muted)' }}
         />
         <button
           onClick={onToggleDarkMode}
           style={btnStyle}
-          title={darkMode ? '라이트 모드' : '다크 모드'}
+          title={darkMode ? t(lang, 'lightMode') : t(lang, 'darkMode')}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
             {darkMode ? (
@@ -38,7 +39,7 @@ export default function TitleBar({ alwaysOnTop, onToggleAlwaysOnTop, opacity, on
         <button
           onClick={onToggleAlwaysOnTop}
           style={btnStyle}
-          title={alwaysOnTop ? '항상 위 해제' : '항상 위 고정'}
+          title={alwaysOnTop ? t(lang, 'pinOn') : t(lang, 'pinOff')}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
             <path
@@ -50,10 +51,10 @@ export default function TitleBar({ alwaysOnTop, onToggleAlwaysOnTop, opacity, on
             />
           </svg>
         </button>
-        <button onClick={() => api?.minimize()} style={btnStyle} title="최소화">
+        <button onClick={() => api?.minimize()} style={btnStyle} title={t(lang, 'minimize')}>
           <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 5h8" stroke="var(--text-muted)" strokeWidth="1.2"/></svg>
         </button>
-        <button onClick={() => api?.close()} style={btnStyle} title="트레이로 숨기기">
+        <button onClick={() => api?.close()} style={btnStyle} title={t(lang, 'close')}>
           <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 2l6 6M8 2l-6 6" stroke="var(--text-muted)" strokeWidth="1.2"/></svg>
         </button>
       </div>

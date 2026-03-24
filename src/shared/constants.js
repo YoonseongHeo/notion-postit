@@ -25,4 +25,5 @@ export const DEFAULT_SETTINGS = {
   alwaysOnTop: true,
   opacity: 1,
   darkMode: false,
+  lang: 'ko',
 };

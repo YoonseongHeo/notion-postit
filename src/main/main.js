@@ -13,6 +13,7 @@ const isDev = !app.isPackaged;
 
 let win = null;
 let refreshTimer = null;
+let updateTrayMenu = null;
 
 function createWindow() {
   const bounds = getWindowBounds();
@@ -71,14 +72,14 @@ ipcMain.handle('notion:fetch-items', async (_event, view) => {
   const settings = getSettings();
   if (!settings.notionToken) {
     // 토큰 없으면 캐시 반환
-    return { items: getCachedItems(), error: 'NOTION_TOKEN이 설정되지 않았습니다.' };
+    const noTokenMsg = settings.lang === 'en' ? 'NOTION_TOKEN is not configured.' : 'NOTION_TOKEN이 설정되지 않았습니다.';
+    return { items: getCachedItems(), error: noTokenMsg };
   }
   try {
     const items = await fetchItems(settings.notionToken, settings.databaseId, view);
     setCachedItems(items);
     return { items, error: null };
   } catch (err) {
-    // 에러 시 캐시 폴백
     return { items: getCachedItems(), error: err.message };
   }
 });
@@ -86,7 +87,8 @@ ipcMain.handle('notion:fetch-items', async (_event, view) => {
 ipcMain.handle('notion:update-status', async (_event, pageId, currentTags, newStatus) => {
   const settings = getSettings();
   if (!settings.notionToken) {
-    return { success: false, error: 'NOTION_TOKEN이 설정되지 않았습니다.' };
+    const noTokenMsg = settings.lang === 'en' ? 'NOTION_TOKEN is not configured.' : 'NOTION_TOKEN이 설정되지 않았습니다.';
+    return { success: false, error: noTokenMsg };
   }
   try {
     await updateStatus(settings.notionToken, pageId, currentTags, newStatus);
@@ -112,6 +114,10 @@ ipcMain.handle('settings:set', (_event, partial) => {
   // opacity 변경 시 윈도우 반영
   if (partial.opacity !== undefined && win) {
     win.setOpacity(partial.opacity);
+  }
+  // 언어 변경 시 트레이 메뉴 업데이트
+  if (partial.lang !== undefined && updateTrayMenu) {
+    updateTrayMenu();
   }
 
   return updated;
@@ -161,7 +167,8 @@ app.whenReady().then(async () => {
   }
 
   createWindow();
-  createTray(win);
+  const trayResult = createTray(win);
+  updateTrayMenu = trayResult.updateMenu;
 
   // 글로벌 단축키: Ctrl+Shift+N → 윈도우 토글
   globalShortcut.register('Ctrl+Shift+N', () => {

@@ -80,7 +80,7 @@ function buildDateFilter(view) {
 function parsePage(page) {
   const props = page.properties;
 
-  const name = props.Name?.title?.map(t => t.plain_text).join('') || '(제목 없음)';
+  const name = props.Name?.title?.map(tx => tx.plain_text).join('') || '';
   const tags = props.Tag?.multi_select?.map(t => t.name) || [];
   const date = props.Date?.date;
   const urgent = props['긴급']?.checkbox || false;
